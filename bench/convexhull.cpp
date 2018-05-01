@@ -38,7 +38,7 @@
 #include "test.hpp"
 #endif
 //#include "prandgen.hpp"
-#include "geometrydata.hpp"
+//#include "geometrydata.hpp"
 #include "readinputbinary.hpp"
 
 #include "hull.h"

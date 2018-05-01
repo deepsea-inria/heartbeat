@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "heartbeatbench.hpp"
-#include "geometrydata.hpp"
+//#include "geometrydata.hpp"
 #include "readinputbinary.hpp" 
 #include "delaunay.hpp"
 #undef blocked_for
