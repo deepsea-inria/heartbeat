@@ -35,7 +35,8 @@ let
     cilk-plus-rts-with-stats = callPackage "${sources.cilkRtsSrc}/script/default.nix" { };
     chunkedseq = callPackage "${sources.chunkedseqSrc}/script/default.nix" { };
     pbbs-include = callPackage "${sources.pbbsIncludeSrc}/default.nix" { };
-    cactus-stack = callPackage "${sources.cactusStackSrc}/default.nix" { };
+    sptl = callPackage "${sources.sptlSrc}/script/default.nix" { };
+    cactus-stack = callPackage "${sources.cactusStackSrc}/script/default.nix" { };
     heartbeatSrc = sources.heartbeatSrc;
     
   };
@@ -77,8 +78,6 @@ stdenv.mkDerivation rec {
     CHUNKEDSEQ_PATH=${chunkedseq}/include/
     SPTL_PATH=${sptl}/include/
     PBBS_INCLUDE_PATH=${pbbs-include}/include/
-    PBBS_SPTL_PATH=${pbbs-sptl}/include/
-    PBBS_SPTL_BENCH_PATH=${pbbs-sptl}/bench/
     ENCORE_INCLUDE_PATH=$out/include/
     USE_32_BIT_WORD_SIZE=1
     USE_CILK=1
