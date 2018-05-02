@@ -41,7 +41,10 @@ let arg_proc =
   XCmd.parse_or_default_list_int "proc" default
 let arg_print_err = XCmd.parse_or_default_bool "print_error" false
 let arg_scheduler = XCmd.parse_or_default_string "scheduler" ""
-    
+let arg_nb_make_cores =
+  let proc = List.fold_left max 1 arg_proc in
+  XCmd.parse_or_default_int "nb_make_cores" proc
+                
 let run_modes =
   Mk_runs.([
     Mode arg_mode;
@@ -73,8 +76,7 @@ let nothing () = ()
 (** Files and binaries *)
 
 let build path bs is_virtual =
-  let proc = List.fold_left max 1 arg_proc in
-   system (sprintf "make -C %s -j%d %s" path proc (String.concat " " bs)) is_virtual
+   system (sprintf "make -C %s -j%d %s" path arg_nb_make_cores (String.concat " " bs)) is_virtual
 
 let file_results exp_name =
   Printf.sprintf "results_%s.txt" exp_name

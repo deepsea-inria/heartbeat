@@ -9,6 +9,7 @@
   gcc ? pkgs.gcc,
   pathToResults ? "",
   pathToData ? "",
+  nbBuildCores ? 0,
   buildDocs ? false
 }:
 
@@ -123,7 +124,12 @@ stdenv.mkDerivation rec {
         "-path_to_data ${pathToData}"
       else "";
     in
-    let flags = "${nmf} ${rf} ${df}";
+    let nbc =
+      if nbBuildCores != 0 then
+        "-nb_make_cores ${toString nbBuildCores}"
+      else "";
+    in
+    let flags = "${nmf} ${rf} ${df} ${nbc}";
     in
     ''
     mkdir -p $out/bench/
