@@ -73,7 +73,8 @@ let nothing () = ()
 (** Files and binaries *)
 
 let build path bs is_virtual =
-   system (sprintf "make -C %s -j12 %s" path (String.concat " " bs)) is_virtual
+  let proc = List.fold_left max 1 arg_proc in
+   system (sprintf "make -C %s -j%d %s" path proc (String.concat " " bs)) is_virtual
 
 let file_results exp_name =
   Printf.sprintf "results_%s.txt" exp_name

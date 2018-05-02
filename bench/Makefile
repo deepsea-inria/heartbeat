@@ -6,8 +6,6 @@ CMDLINE_PATH=$(PACKAGE_PATH)/cmdline/include
 CHUNKEDSEQ_PATH=$(PACKAGE_PATH)/chunkedseq/include
 SPTL_PATH=$(PACKAGE_PATH)/sptl/include
 PBBS_INCLUDE_PATH=$(PACKAGE_PATH)/pbbs-include/
-PBBS_SPTL_PATH=$(PACKAGE_PATH)/pbbs-sptl/include
-PBBS_SPTL_BENCH_PATH=$(PACKAGE_PATH)/pbbs-sptl/bench
 CACTUS_PATH=$(PACKAGE_PATH)/cactus-stack/include
 HEARTBEAT_INCLUDE_PATH=../include/
 
@@ -15,7 +13,7 @@ CUSTOM_MALLOC_PREFIX=
 
 HWLOC_FLAGS=`pkg-config --cflags hwloc`
 HWLOC_LIBS=`pkg-config --libs hwloc`
-HWLOC_PREFIX_ALL=-DHAVE_HWLOC $(HWLOC_FLAGS) $(HWLOC_LI
+HWLOC_PREFIX_ALL=-DHAVE_HWLOC $(HWLOC_FLAGS) $(HWLOC_LIBS)
 
 ####################################################################
 # Makefile options
@@ -52,14 +50,14 @@ ifeq ($(strip $(USE_HWLOC)),1)
    HWLOC_PREFIX=$(HWLOC_PREFIX_ALL)
 endif
 
-INCLUDE_FILES=$(wildcard $(CHUNKEDSEQ_PATH)/*.hpp) $(wildcard $(HEARTBEAT_INCLUDE_PATH)/*.hpp) $(wildcard $(CMDLINE_PATH)/*.hpp) $(wildcard $(PBBS_INCLUDE_PATH)/*.hpp) $(wildcard $(SPTL_PATH)/*.hpp) $(wildcard $(PBBS_SPTL_PATH)/*.hpp) $(wildcard $(PBBS_SPTL_BENCH_PATH)/*.hpp) $(wildcard $(CACTUS_PATH)/*.hpp) $(wildcard *.hpp)
+INCLUDE_FILES=$(wildcard $(CHUNKEDSEQ_PATH)/*.hpp) $(wildcard $(HEARTBEAT_INCLUDE_PATH)/*.hpp) $(wildcard $(CMDLINE_PATH)/*.hpp) $(wildcard $(PBBS_INCLUDE_PATH)/*.hpp) $(wildcard $(SPTL_PATH)/*.hpp) $(wildcard $(CACTUS_PATH)/*.hpp) $(wildcard *.hpp)
 
-INCLUDE_PREFIX= -I $(CHUNKEDSEQ_PATH) -I $(HEARTBEAT_INCLUDE_PATH) -I $(CMDLINE_PATH) -I $(PBBS_INCLUDE_PATH) -I $(SPTL_PATH) -I $(PBBS_SPTL_PATH) -I $(PBBS_SPTL_BENCH_PATH) -I $(CACTUS_PATH)
+INCLUDE_PREFIX= -I $(CHUNKEDSEQ_PATH) -I $(HEARTBEAT_INCLUDE_PATH) -I $(CMDLINE_PATH) -I $(PBBS_INCLUDE_PATH) -I $(SPTL_PATH) -I $(CACTUS_PATH)
 
 CILK_PREFIX=
 ifeq ($(strip $(USE_CILK)),1)
-	CILK_PREFIX= -fcilkplus -lcilkrts -ldl -DUSE_CILK_PLUS -DUSE_CILK_PLUS_RUNTIME -DHEARTBEAT_BENCHMARK
-	CILK_PREFIX+=$(CILK_EXTRAS_PREFIX)
+	CILK_PREFIX=$(CILK_EXTRAS_PREFIX)
+	CILK_PREFIX+=-fcilkplus -lcilkrts -ldl -DUSE_CILK_PLUS -DUSE_CILK_PLUS_RUNTIME -DHEARTBEAT_BENCHMARK
 endif
 
 COMMON_PREFIX= -w -DHAVE_GCC_TLS -fpermissive -pthread -O2 -march=native -DNDEBUG -std=gnu++1y $(HWLOC_PREFIX) -DTARGET_LINUX -m64 -DTARGET_X86_64 -DMANUAL_CONTROL #-DTIME_MEASURE
@@ -75,7 +73,7 @@ DEBUG_PREFIX= -w -fpermissive -pthread -O0 -std=gnu++11 -g $(LOGGING_PREFIX) -DT
 %.dbg: %.cpp $(INCLUDE_FILES)
 	g++ -DHEARTBEAT_ENABLE_STATS $(DEBUG_PREFIX) $(INCLUDE_PREFIX) -o $@ $<
 
-%.cilk: %.cpp $(INCLUDE_FILES) $(PBBS_INCLUDE_PATH)
+%.cilk: %.cpp $(INCLUDE_FILES) 
 	g++ $(CILK_PREFIX) $(COMMON_PREFIX) $(CUSTOM_MALLOC_PREFIX) $(INCLUDE_PREFIX) -o $@ $<
 
 %.cilk_debug: %.cpp $(INCLUDE_FILES) $(PBBS_INCLUDE_PATH)

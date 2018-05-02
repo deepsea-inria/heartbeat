@@ -44,7 +44,7 @@ void run_and_report_elapsed_time(const Function& f) {
    *   export LD_LIBRARY_PATH=/home/rainey/cilk-plus-rts/lib:$LD_LIBRARY_PATH
    */
 #ifdef CILK_RUNTIME_WITH_STATS
-  __cilkg_dump_heartbeat_stats_to_stderr();
+  __cilkg_dump_encore_stats_to_stderr();
 #endif
 }
 
