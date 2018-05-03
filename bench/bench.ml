@@ -243,7 +243,7 @@ let cilk_progs = List.map cilk_prog_of all_benchmarks
 let cilk_elision_progs = List.map cilk_elision_prog_of all_benchmarks
 let all_progs = List.concat [heartbeat_progs; cilk_progs; cilk_elision_progs]
 
-let path_to_infile n = arg_path_to_data ^ n
+let path_to_infile n = arg_path_to_data ^ "/" ^ n
 
 let mk_infiles ty descr = fun e ->
   let f (p, t, n) =
