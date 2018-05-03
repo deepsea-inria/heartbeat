@@ -509,7 +509,7 @@ let benchmarks' : benchmark_descriptor list = [
   
 ]
 
-                                            let infiles_by_hash = [
+let infiles_by_hash = [
   "QmXZjB1y8uFZ5RjwsiA9JvjyoCNBHwKAvKFtGY7rb7tA5V", "3Dgrid_J_10000000.bin";
   "QmZFTC6Zbi9qyJLAyprPc6z8GghvkDcNis9Sta2QrPjX1j", "angel_ray_cast_dataset.bin";
   "QmXv2RnFr1H5S4ip3LQoZxQffL89LUjmrc93ehui21bkUw", "array_double_almost_sorted_10000_large.bin";
