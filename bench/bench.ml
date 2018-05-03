@@ -44,6 +44,8 @@ let arg_scheduler = XCmd.parse_or_default_string "scheduler" ""
 let arg_nb_make_cores =
   let proc = List.fold_left max 1 arg_proc in
   XCmd.parse_or_default_int "nb_make_cores" proc
+let arg_path_to_data = XCmd.parse_or_default_string "path_to_data" "_data"
+let arg_path_to_results = XCmd.parse_or_default_string "path_to_results" "_results"
                 
 let run_modes =
   Mk_runs.([
@@ -62,10 +64,14 @@ let select get make run check plot =
          then "make"::arg_skips
          else arg_skips
       in
+   let run' () = (
+       system (Printf.sprintf "mkdir -p %s" arg_path_to_results) false;
+       run())
+   in
    Pbench.execute_from_only_skip arg_onlys arg_skips [
       "get", get;
       "make", make;
-      "run", run;
+      "run", run';
       "check", check;
       "plot", plot;
       ]
@@ -79,16 +85,16 @@ let build path bs is_virtual =
    system (sprintf "make -C %s -j%d %s" path arg_nb_make_cores (String.concat " " bs)) is_virtual
 
 let file_results exp_name =
-  Printf.sprintf "results_%s.txt" exp_name
+  Printf.sprintf "%s/results_%s.txt" arg_path_to_results exp_name
 
 let file_tables_src exp_name =
-  Printf.sprintf "tables_%s.tex" exp_name
+  Printf.sprintf "%s/tables_%s.tex" arg_path_to_results exp_name
 
 let file_tables exp_name =
-  Printf.sprintf "tables_%s.pdf" exp_name
+  Printf.sprintf "%s/tables_%s.pdf" arg_path_to_results exp_name
 
 let file_plots exp_name =
-  Printf.sprintf "plots_%s.pdf" exp_name
+  Printf.sprintf "%s/plots_%s.pdf" arg_path_to_results exp_name
 
 (** Evaluation functions *)
 
@@ -237,7 +243,7 @@ let cilk_progs = List.map cilk_prog_of all_benchmarks
 let cilk_elision_progs = List.map cilk_elision_prog_of all_benchmarks
 let all_progs = List.concat [heartbeat_progs; cilk_progs; cilk_elision_progs]
 
-let path_to_infile n = "_data/" ^ n
+let path_to_infile n = arg_path_to_data ^ n
 
 let mk_infiles ty descr = fun e ->
   let f (p, t, n) =
@@ -665,9 +671,11 @@ let pretty_input_name n =
   | (m, _, p) :: _ -> p
   | [] -> failwith ("pretty name: " ^ n)
 
-let get() = (
-  fetch_infiles_of_benchmarks path_to_infile arg_force_get arg_virtual_get benchmarks all_benchmarks;
-  ())
+let get() = 
+  let _ = system (Printf.sprintf "mkdir -p %s" arg_path_to_data) arg_virtual_get in    
+  (
+    fetch_infiles_of_benchmarks path_to_infile arg_force_get arg_virtual_get benchmarks all_benchmarks;
+    ())
                   
 let make() =
   build "." all_progs arg_virtual_build
