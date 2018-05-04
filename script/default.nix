@@ -120,7 +120,7 @@ stdenv.mkDerivation rec {
       else "";
     in
     let df =
-      if pathToResults != "" then
+      if pathToData != "" then
         "-path_to_data ${pathToData}"
       else "";
     in
