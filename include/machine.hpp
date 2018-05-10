@@ -26,6 +26,7 @@ hwloc_topology_t topology;
 #endif
 
 void initialize_hwloc(int nb_workers) {
+  bool numa_interleave = false;
 #ifdef HAVE_HWLOC
   hwloc_topology_init(&topology);
   hwloc_topology_load(topology);
@@ -40,6 +41,7 @@ void initialize_hwloc(int nb_workers) {
     }
   }
 #endif
+  printf("hwloc_interleave %d\n", numa_interleave);
 }
 
 void initialize_hwloc() {
