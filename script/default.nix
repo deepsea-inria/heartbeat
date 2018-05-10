@@ -2,11 +2,11 @@
   stdenv ? pkgs.stdenv,
   sources ? import ./default-sources.nix,
   gperftools ? pkgs.gperftools,
-  useHwloc ? false,
+  useHwloc ? true,
   hwloc ? pkgs.hwloc,
   libunwind ? pkgs.libunwind,
   useLibunwind ? false,
-  gcc ? pkgs.gcc,
+  gcc ? pkgs.gcc7,
   pathToResults ? "",
   pathToData ? "",
   nbBuildCores ? 0,
@@ -76,7 +76,6 @@ stdenv.mkDerivation rec {
       SPTL_PATH=${sptl}/include/
       PBBS_INCLUDE_PATH=${pbbs-include}/include/
       ENCORE_INCLUDE_PATH=$out/include/
-      USE_32_BIT_WORD_SIZE=1
       USE_CILK=1
       CUSTOM_MALLOC_PREFIX=-ltcmalloc -L${gperftools}/lib
       CILK_EXTRAS_PREFIX=-L ${cilk-plus-rts-with-stats}/lib -I ${cilk-plus-rts-with-stats}/include -ldl -DCILK_RUNTIME_WITH_STATS -DCUSTOM_CILK_PLUS_RUNTIME
