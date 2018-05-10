@@ -769,18 +769,18 @@ let plot() =
         Mk_table.cell ~escape:false ~last:false add ""
       done;
       Mk_table.cell ~escape:false ~last:false add "PBBS";
-      Mk_table.cell ~escape:false ~last:false add "Encore";
+      Mk_table.cell ~escape:false ~last:false add "Heartbeat";
       Mk_table.cell ~escape:false ~last:false add "PBBS";
-      Mk_table.cell ~escape:false ~last:false add "Encore";
+      Mk_table.cell ~escape:false ~last:false add "Heartbeat";
       ~~ List.iteri multi_proc (fun i proc ->
         let last = i + 1 = nb_multi_proc in
 	      Mk_table.cell ~escape:false ~last:false add "PBBS";
-	      Mk_table.cell ~escape:false ~last:false add "Encore";
+	      Mk_table.cell ~escape:false ~last:false add "Heartbeat";
 	      if arg_show_utilization then begin
   	        Mk_table.cell ~escape:false ~last:false add "PBBS";
-		Mk_table.cell ~escape:false ~last:false add "Encore"
+		Mk_table.cell ~escape:false ~last:false add "Heartbeat"
               end;
-	      Mk_table.cell ~escape:false ~last:last add (Latex.tabular_multicol 2 "|c|" "Encore/PBBS"));
+	      Mk_table.cell ~escape:false ~last:last add (Latex.tabular_multicol 2 "|c|" "Heartbeat/PBBS"));
       add Latex.tabular_newline;
 
       (* Emit third row, i.e., third-level column labels *)
