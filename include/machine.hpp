@@ -38,10 +38,12 @@ void initialize_hwloc(int nb_workers) {
     int err = hwloc_set_membind(topology, all_cpus, HWLOC_MEMBIND_INTERLEAVE, 0);
     if (err < 0) {
       printf("Warning: failed to set NUMA round-robin allocation policy\n");
+    } else {
+      numa_interleave = true;
     }
   }
 #endif
-  printf("hwloc_interleave %d\n", numa_interleave);
+  printf("numa_interleave %d\n", numa_interleave);
 }
 
 void initialize_hwloc() {
