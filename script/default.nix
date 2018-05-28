@@ -4,8 +4,7 @@
   gperftools ? pkgs.gperftools,
   useHwloc ? true,
   hwloc ? pkgs.hwloc,
-  libunwind ? pkgs.libunwind,
-  useLibunwind ? false,
+  libunwind ? null,
   gcc ? pkgs.gcc7,
   pathToResults ? "",
   pathToData ? "",
@@ -23,7 +22,6 @@ let
     useHwloc = useHwloc;
 
     libunwind = libunwind;
-    useLibunwind = useLibunwind;
 
     gperftools = gperftools;
 
@@ -102,7 +100,7 @@ stdenv.mkDerivation rec {
 
   installPhase =
     let lu =
-        if useLibunwind then
+        if libunwind != null then
            ''--prefix LD_LIBRARY_PATH ":" ${libunwind}/lib''
         else "";
     in
