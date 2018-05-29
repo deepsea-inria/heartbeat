@@ -1022,6 +1022,9 @@ void launch(int nb_workers, vertex* v) {
 } // end namespace
 
 void launch_scheduler(int nb_workers, vertex* v) {
+  random_number_generators.for_each([&] (int i, std::mt19937& g) {
+    g.seed(i);
+  });
   if (scheduler == steal_half_work_stealing_tag) {
     steal_half_work_stealing::launch(nb_workers, v);
   } else if (scheduler == heartbeat_work_stealing_tag) {
