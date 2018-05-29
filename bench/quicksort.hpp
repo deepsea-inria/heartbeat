@@ -43,6 +43,32 @@ E median2(E a, E b, E c, BinPred f) {
            : (f(a,c) ? a : (f(b,c) ? c : b));
 }
 
+template <class E, class BinPred, class intT>
+void quickSort2(E* A, intT n, BinPred f) {
+  if (n < ISORT) insertionSort2(A, n, f);
+  else {
+    //E p = std::__median(A[n/4],A[n/2],A[(3*n)/4],f);
+    E p = median2(A[n/4],A[n/2],A[(3*n)/4],f);
+    E* L = A;   // below L are less than pivot
+    E* M = A;   // between L and M are equal to pivot
+    E* R = A+n-1; // above R are greater than pivot
+    while (1) {
+      while (!f(p,*M)) {
+        if (f(*M,p)) std::swap(*M,*(L++));
+        if (M >= R) break; 
+        M++;
+      }
+      while (f(p,*R)) R--;
+      if (M >= R) break; 
+      std::swap(*M,*R--); 
+      if (f(*M,p)) std::swap(*M,*(L++));
+      M++;
+    }
+    quickSort2(A, L-A, f);
+    quickSort2(M, A+n-M, f); // Exclude all elts that equal pivot
+  }
+}
+
 // Quicksort based on median of three elements as pivot
 //  and uses insertionSort for small inputs
 template<class E, class BinPred, class intT>
@@ -53,6 +79,7 @@ public:
   E* M; E* L; E* R; E p; bool b;
   using trampoline = enum { loop1, loop2 };
   trampoline t;
+  using controller_type = heartbeat::grain::controller<heartbeat::grain::automatic, quicksort>;
 
   quicksort(E* A, intT n, BinPred f)
     : A(A), n(n), f(f) { }
@@ -63,6 +90,12 @@ public:
   dc get_dc() {
     return dc::mk_if([] (sar& s, par&) { return s.n < ISORT; }, dc::stmt([] (sar& s, par& p) {
       insertionSort2(s.A, s.n, s.f);
+    }),
+    dc::mk_if([] (sar& s, par&) {
+        auto lg_lt = controller_type::predict_lg_nb_iterations();
+        auto lt = controller_type::predict_nb_iterations(lg_lt);
+        return s.n <= lt; }, dc::stmt([] (sar& s, par& p) {
+      quickSort2(s.A, s.n, s.f);
     }), dc::stmts({
     dc::stmt([] (sar& s, par&) {
       auto n = s.n;
@@ -75,7 +108,6 @@ public:
       s.b = true;
     }),
     dc::sequential_loop([] (sar& s, par&) { return s.b; }, dc::stmt([] (sar& s, par&) {
-      using controller_type = heartbeat::grain::controller<heartbeat::grain::automatic, quicksort>;
       auto lg_lt = controller_type::predict_lg_nb_iterations();
       auto lt = controller_type::predict_nb_iterations(lg_lt);
       int fuel0 = lt;
@@ -131,7 +163,7 @@ public:
          return heartbeat_call<quicksort<E,BinPred,intT>>(st, pt, s.A, s.L-s.A, s.f);
     }, [] (sar& s, par&, plt pt, stt st) {
          return heartbeat_call<quicksort<E,BinPred,intT>>(st, pt, s.M, s.A+s.n-s.M, s.f);
-    })}));
+       })})));
   }
   
 };

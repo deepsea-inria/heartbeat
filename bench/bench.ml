@@ -11,6 +11,7 @@ let arg_virtual_build = XCmd.mem_flag "virtual_build"
 let arg_virtual_get = XCmd.mem_flag "virtual_get"
 let arg_force_get = XCmd.mem_flag "force_get"
 let arg_nb_runs = XCmd.parse_or_default_int "runs" 1
+let arg_nb_seq_runs = XCmd.parse_or_default_int "seq_runs" 1
 let arg_mode = Mk_runs.mode_from_command_line "mode"
 let arg_skips = XCmd.parse_or_default_list_string "skip" []
 let arg_onlys = XCmd.parse_or_default_list_string "only" []
@@ -53,6 +54,12 @@ let run_modes =
     Virtual arg_virtual_run;
     Runs arg_nb_runs; ])
 
+let seq_run_modes =
+  Mk_runs.([
+    Mode arg_mode;
+    Virtual arg_virtual_run;
+    Runs arg_nb_seq_runs; ])
+    
 let multi_proc = List.filter (fun p -> p <> 1) arg_proc
 
 (*****************************************************************************)
@@ -700,28 +707,39 @@ let nb_multi_proc = List.length multi_proc
         
 let run() =
   List.iter (fun benchmark ->
+    let heartbeat_prog = mk_heartbeat_prog benchmark.bd_name in
+    let pbbs_prog = mk_pbbs_prog benchmark.bd_name in
+    let heartbeat_elision_prog = heartbeat_prog & mk_never_promote in
+    let pbbs_elision_prog = mk_pbbs_elision_prog benchmark.bd_name in
+    let rseq mk_progs file_results = 
+      Mk_runs.(call (seq_run_modes @ [
+        Output file_results;
+        Timeout 800;
+        Args (mk_progs & benchmark.bd_infiles); ]))
+    in
     let r mk_progs file_results = 
       Mk_runs.(call (run_modes @ [
         Output file_results;
         Timeout 400;
         Args (mk_progs & benchmark.bd_infiles); ]))
     in
-    let heartbeat_prog = mk_heartbeat_prog benchmark.bd_name in
-    let heartbeat_elision_prog = heartbeat_prog & mk_never_promote in
-    let pbbs_prog = mk_pbbs_prog benchmark.bd_name in
-    let pbbs_elision_prog = mk_pbbs_elision_prog benchmark.bd_name in
-    (if nb_multi_proc > 0 then (
-      r ((heartbeat_prog ++ pbbs_prog) & mk_multi_proc) (file_results benchmark.bd_name))
-     else
-       ());
-    (if List.exists (fun p -> p = 1) arg_proc then (
-      r (heartbeat_prog & mk_single_proc) (file_results_heartbeat_single_proc benchmark.bd_name);
-      r (pbbs_prog & mk_single_proc) (file_results_pbbs_single_proc benchmark.bd_name);
-      r (heartbeat_elision_prog & mk_single_proc) (file_results_heartbeat_elision benchmark.bd_name);
-      r (pbbs_elision_prog & mk_single_proc) (file_results_pbbs_elision benchmark.bd_name))
-     else
-       ())
-  ) benchmarks
+    let _ = 
+      if nb_multi_proc > 0 then (
+	r ((heartbeat_prog ++ pbbs_prog) & mk_multi_proc) (file_results benchmark.bd_name))
+      else
+	()
+    in
+    let _ =
+      if List.exists (fun p -> p = 1) arg_proc then (
+	rseq (heartbeat_prog & mk_single_proc) (file_results_heartbeat_single_proc benchmark.bd_name);
+	rseq (pbbs_prog & mk_single_proc) (file_results_pbbs_single_proc benchmark.bd_name);
+	rseq (heartbeat_elision_prog & mk_single_proc) (file_results_heartbeat_elision benchmark.bd_name);
+	rseq (pbbs_elision_prog & mk_single_proc) (file_results_pbbs_elision benchmark.bd_name))
+       else
+	 ()
+    in
+    ()
+   ) benchmarks
 
 let check = nothing  (* do something here *)
 
@@ -769,18 +787,18 @@ let plot() =
         Mk_table.cell ~escape:false ~last:false add ""
       done;
       Mk_table.cell ~escape:false ~last:false add "PBBS";
-      Mk_table.cell ~escape:false ~last:false add "Encore";
+      Mk_table.cell ~escape:false ~last:false add "Heartbeat";
       Mk_table.cell ~escape:false ~last:false add "PBBS";
-      Mk_table.cell ~escape:false ~last:false add "Encore";
+      Mk_table.cell ~escape:false ~last:false add "Heartbeat";
       ~~ List.iteri multi_proc (fun i proc ->
         let last = i + 1 = nb_multi_proc in
 	      Mk_table.cell ~escape:false ~last:false add "PBBS";
-	      Mk_table.cell ~escape:false ~last:false add "Encore";
+	      Mk_table.cell ~escape:false ~last:false add "Heartbeat";
 	      if arg_show_utilization then begin
   	        Mk_table.cell ~escape:false ~last:false add "PBBS";
-		Mk_table.cell ~escape:false ~last:false add "Encore"
+		Mk_table.cell ~escape:false ~last:false add "Heartbeat"
               end;
-	      Mk_table.cell ~escape:false ~last:last add (Latex.tabular_multicol 2 "|c|" "Encore/PBBS"));
+	      Mk_table.cell ~escape:false ~last:last add (Latex.tabular_multicol 2 "|c|" "Heartbeat/PBBS"));
       add Latex.tabular_newline;
 
       (* Emit third row, i.e., third-level column labels *)
