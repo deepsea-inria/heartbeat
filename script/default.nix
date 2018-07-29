@@ -1,6 +1,6 @@
 { pkgs   ? import <nixpkgs> {},
   stdenv ? pkgs.stdenv,
-  sources ? import ./local-sources.nix,
+  sources ? import ./default-sources.nix,
   gperftools ? pkgs.gperftools,
   useHwloc ? true,
   hwloc ? pkgs.hwloc,

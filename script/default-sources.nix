@@ -54,8 +54,8 @@ let pkgs = import <nixpkgs> {}; in
   heartbeatSrc = pkgs.fetchFromGitHub {
     owner  = "deepsea-inria";
     repo   = "heartbeat";
-    rev    = "c2f5e6a8b0fc40741b6b3382c9c83fa3281f2fcf";
-    sha256 = "0p917l0vrc9zndfblz7zx8iyb87bpipwv2w7f7crdhdhz1sw0f1s";
+    rev    = "ead4fb3d087adee477f2034c1008c479530e6a50";
+    sha256 = "1snj3ndh33hmdmccaw1nya5hja4s822h5rqmfwy499s7hywp3rxq";
   };
 
 }
