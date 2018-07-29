@@ -150,7 +150,7 @@ let string_of_percentage_change ?(show_plus=true) vold vnew =
   string_of_percentage ~show_plus:show_plus (vnew /. vold -. 1.0)
 
 let ipfs_get hash outfile is_virtual =
-  system (sprintf "wget -O %s https://ipfs.io/ipfs/%s" outfile hash) is_virtual
+  system (sprintf "ipget -o %s %s" outfile hash) is_virtual
 
 let ipfs_get_if_needed hash outfile force_get is_virtual =
   if force_get || not (Sys.file_exists outfile) then

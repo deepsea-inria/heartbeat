@@ -1,6 +1,6 @@
 { pkgs   ? import <nixpkgs> {},
   stdenv ? pkgs.stdenv,
-  sources ? import ./default-sources.nix,
+  sources ? import ./local-sources.nix,
   gperftools ? pkgs.gperftools,
   useHwloc ? true,
   hwloc ? pkgs.hwloc,
@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
     let docs = if buildDocs then [ pkgs.pandoc ] else []; in
     [ pbench sptl pbbs-include cmdline chunkedseq
       pkgs.makeWrapper pkgs.R pkgs.texlive.combined.scheme-small
-      pkgs.ocaml gcc pkgs.wget
+      pkgs.ocaml gcc
     ] ++ docs;
         
   configurePhase =
@@ -134,7 +134,7 @@ stdenv.mkDerivation rec {
     wrapProgram $out/bench/bench.pbench --prefix PATH ":" ${pkgs.R}/bin \
        --prefix PATH ":" ${pkgs.texlive.combined.scheme-small}/bin \
        --prefix PATH ":" ${gcc}/bin \
-       --prefix PATH ":" ${pkgs.wget}/bin \
+       --prefix PATH ":" ${pkgs.ipget}/bin \
        --prefix PATH ":" $out/bench \
        --prefix LD_LIBRARY_PATH ":" ${gcc}/lib \
        --prefix LD_LIBRARY_PATH ":" ${gcc}/lib64 \
