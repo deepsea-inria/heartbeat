@@ -54,7 +54,7 @@ stdenv.mkDerivation rec {
     let docs = if buildDocs then [ pkgs.pandoc ] else []; in
     [ pbench sptl pbbs-include cmdline chunkedseq
       pkgs.makeWrapper pkgs.R pkgs.texlive.combined.scheme-small
-      pkgs.ocaml gcc
+      pkgs.ocaml gcc hwloc
     ] ++ docs;
         
   configurePhase =
@@ -96,6 +96,7 @@ stdenv.mkDerivation rec {
     ''
     cp ${getNbCoresScript} bench/
     make -C bench bench.pbench
+    ${getNbCoresScript} > bench/nb_cores
     '';  
 
   installPhase =
@@ -126,7 +127,10 @@ stdenv.mkDerivation rec {
         "-nb_make_cores ${toString nbBuildCores}"
       else "";
     in
-    let flags = "${nmf} ${rf} ${df} ${nbc}";
+    let nc =
+        "-path_to_nb_cores $out/bench/nb_cores";
+    in
+    let flags = "${nmf} ${rf} ${df} ${nbc} ${nc}";
     in
     ''
     mkdir -p $out/bench/
@@ -148,7 +152,7 @@ stdenv.mkDerivation rec {
     $out/bench/bench.pbench compare -only make
     popd
     cp bench/sptl_config.txt $out/bench/sptl_config.txt
-    cp bench/*.heartbeat bench/*.cilk_elision bench/*.cilk $out/bench/
+    cp bench/*.heartbeat bench/*.cilk_elision bench/*.cilk bench/nb_cores $out/bench/
     '';
 
   meta = {
