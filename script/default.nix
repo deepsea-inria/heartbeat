@@ -42,15 +42,16 @@ stdenv.mkDerivation rec {
           HWLOC_LIBS="-L ${hwloc.lib}/lib/ -lhwloc"
       '' else "";
     in
-    let clangConfig =
+    let cppConfig =
           if clang != null then ''
-          export CXX=${clang}/clang++ -frtti -fno-exceptions -latomic
-          '' else "";
+          CXX=${clang}/bin/clang++ -frtti -fno-exceptions -latomic
+          '' else ''
+          CXX=${gcc}/bin/g++
+          '';
     in
     let sptlConfigFile = pkgs.writeText "sptl_config.txt" "${sptl}/bin/"; in
     ''
     cp ${sptlConfigFile} bench/sptl_config.txt
-    ${clangConfig}
     make -C bench clean
     make -j $NIX_BUILD_CORES -C bench \
       all \
@@ -63,6 +64,7 @@ stdenv.mkDerivation rec {
       USE_CILK=1 \
       CUSTOM_MALLOC_PREFIX="-ltcmalloc -L${gperftools}/lib" \
       CILK_EXTRAS_PREFIX="-L ${cilk-plus-rts-with-stats}/lib -I ${cilk-plus-rts-with-stats}/include -ldl -DCILK_RUNTIME_WITH_STATS -DCUSTOM_CILK_PLUS_RUNTIME" \
+      ${cppConfig} \
       ${hwlocConfig}
   '';
   
