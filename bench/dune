@@ -1,0 +1,10 @@
+(executables
+  (names bench)
+  (libraries pbench.xlib pbench.lib)
+  (public_names bench))
+
+(env
+  (dev
+    (flags (:standard -open Lib -open Xlib -warn-error -A)))
+  (release
+    (flags (:standard -open Lib -open Xlib -warn-error -A))))

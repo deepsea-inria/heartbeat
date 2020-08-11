@@ -1,0 +1,15 @@
+opam-version: "2.0"
+name: "bench"
+maintainer: "Mike Rainey"
+authors: [ "Mike Rainey" ]
+license: "BSD-3-clause"
+build: [
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs]
+]
+depends: [
+  "ocaml" {>= "4.04.1"}
+  "dune" {build & >= "1.0"}
+  "pbench"
+]
+synopsis: "Script for benchmarking parallel SML binaries."
