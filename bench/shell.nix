@@ -36,7 +36,9 @@ with pkgs; {
           if clang != null then ''
           export CXX="${clang}/bin/clang++ -frtti -fno-exceptions"
           export LD_FLAGS=-latomic $LD_FLAGS
-          '' else "";
+          '' else ''
+            export CXX="${gcc}/bin/c++"
+          '';
       in
       let hwlocFlgs =
             if hwloc == null then
