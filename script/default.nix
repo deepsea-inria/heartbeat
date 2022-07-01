@@ -111,7 +111,7 @@ stdenv.mkDerivation rec {
        --add-flags "${flags}"
     make -C bench INSTALL_FOLDER=$out/bench install
     cp bench/sptl_config.txt $out/bench/sptl_config.txt
-    cp bench/nb_cores $out/bench/
+    ${pbench}/get-nb-cores.sh > $out/bench/nb_cores
     '';
 
   meta = {
